@@ -3,9 +3,10 @@
 ![Kinesis_Apigateway_S3_Snowflake_Lambda](https://github.com/Moiz081/Real-Time-Data-Pipeline-with-AWS-and-Snowflake/blob/main/Kinesis_Apigateway_S3_Snowflake_Lambda.png?raw=true)
 
 
+
 Use Postman to make an API call, the Amazon API Gateway will trigger a Lambda function, the function will write into the s3 bucket, then Snowpipe will start to write the data into a Snowflake. To not activate Snowpipe for every API call and optimize the process, we will use Amazon Kinesis data Stream to collect the data first (dump the data based on the buffer size or the time or if there are few messages), then use Kinesis Firehouse to leave the data into s3. 
 
- 
+
 
 Step 1: Create the Lambda Role 
 - 
@@ -19,6 +20,7 @@ Step 1: Create the Lambda Role
 
 Step 2: Create the lambda function to read the data from API Gateway and put it in Kinesis Data Stream
 - 
+
 
 <img width="1263" alt="Screen Shot 2024-01-02 at 12 57 50 PM" src="https://github.com/gakas14/Serverless-data-stream-with-kinesis-data-stream-kinesis-firehouse-S3-and-snowflake/assets/74584964/8f5184fa-e91b-4922-b215-15cef8978c14">
 
@@ -108,7 +110,6 @@ This second lambda function will transform the data( decode the data to put a de
 			    print('Processed {} records.'.format(len(event['records'])))
 			    
 			    return {'records': output}
--
 
 
 
@@ -145,7 +146,7 @@ Step 8: Create a Snowflake role.
 
 
 
-Storage Integration Creation: Copy the snowflake role arm into the snowflake console and copy the s3 bucket arm role. 
+- Storage Integration Creation: Copy the snowflake role arm into the snowflake console and copy the s3 bucket arm role. 
 
 			create warehouse s3_to_snowflake_wh;
 			use s3_to_snowflake_wh;
@@ -197,29 +198,28 @@ Storage Integration Creation: Copy the snowflake role arm into the snowflake con
 			--Query the table
 			select parse_json(VALUE):Age as Age  , trim(parse_json(VALUE):Name,'"') as Name from  s3_to_snowflake.PUBLIC.Person;
 
-- 
 
-Copy the 'STORAGE_AWS_IAM_USER_ARN' ARN and 'STORAGE_AWS_EXTERNAL_ID' from Snowflake and update the Trust Policy in the Snowflake role in IAM. 
+
+- Copy the 'STORAGE_AWS_IAM_USER_ARN' ARN and 'STORAGE_AWS_EXTERNAL_ID' from Snowflake and update the Trust Policy in the Snowflake role in IAM. 
 
  <img width="1271" alt="Screen Shot 2024-01-02 at 2 19 25 PM" src="https://github.com/gakas14/Serverless-data-stream-with-kinesis-data-stream-kinesis-firehouse-S3-and-snowflake/assets/74584964/52f82acd-e723-4280-918a-963af3ffb56f">
  
-- 
 
-Create an event notification for the s3 bucket. 
+
+- Create an event notification for the s3 bucket. 
 
 <img width="1263" alt="Screen Shot 2024-01-02 at 2 26 11 PM" src="https://github.com/gakas14/Serverless-data-stream-with-kinesis-data-stream-kinesis-firehouse-S3-and-snowflake/assets/74584964/4d487de5-ef90-477c-ad28-64ed8f62b31e">
  
--	
+	
 
 <img width="1269" alt="Screen Shot 2024-01-02 at 2 26 17 PM" src="https://github.com/gakas14/Serverless-data-stream-with-kinesis-data-stream-kinesis-firehouse-S3-and-snowflake/assets/74584964/aa4106d0-68b9-4cea-a7b9-2dfa9b8e432b">
-
--	
+	
 
 <img width="1228" alt="Screen Shot 2024-01-02 at 2 26 26 PM" src="https://github.com/gakas14/Serverless-data-stream-with-kinesis-data-stream-kinesis-firehouse-S3-and-snowflake/assets/74584964/4b502a0f-8d27-4596-b991-84a4f6cdcc07">
 
 
 Step 9: Test the pipeline 
-- 
+-
 
 - Open Postman and pass a series of records 
 		{"Name": "wang", "Age":4}
